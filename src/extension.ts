@@ -45,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function validateMarkdown(str: string): boolean {
 
-	if (str.match(/^- .*(\r)*\n +- .*/) !== null) {
+	if (str.match(/^-.*(\r)*\n +- .*/) !== null) {
 		// valid netsted lists
 
 		return true;
