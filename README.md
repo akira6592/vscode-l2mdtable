@@ -1,5 +1,4 @@
 # Convert list to Markdown table
-![icon](images/icon.png)
 
 ## Features
 ### Convert list to Markdown table
