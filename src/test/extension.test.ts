@@ -4,6 +4,7 @@ import * as ext from "../extension";
 suite("validation Tests", function () {
 
     test("normal cases", function() {
+        // no space at first "-" 
         assert.strictEqual(true, ext.validateMarkdown("- \n - a"));
         assert.strictEqual(true, ext.validateMarkdown("- \n  - a"));
         assert.strictEqual(true, ext.validateMarkdown("- a\n - a"));
@@ -14,6 +15,18 @@ suite("validation Tests", function () {
         assert.strictEqual(true, ext.validateMarkdown("- a\r\n - a"));
         assert.strictEqual(true, ext.validateMarkdown("- a\r\n - a\n"));
         assert.strictEqual(true, ext.validateMarkdown("- a\r\n  - a"));
+
+        // space at first "-"
+        assert.strictEqual(true, ext.validateMarkdown("-\n - a"));
+        assert.strictEqual(true, ext.validateMarkdown("-\n  - a"));
+        assert.strictEqual(true, ext.validateMarkdown("-a\n - a"));
+        assert.strictEqual(true, ext.validateMarkdown("-a\n - a\n"));
+        assert.strictEqual(true, ext.validateMarkdown("-a\n  - a"));
+        assert.strictEqual(true, ext.validateMarkdown("-\r\n - a"));
+        assert.strictEqual(true, ext.validateMarkdown("-\r\n  - a"));
+        assert.strictEqual(true, ext.validateMarkdown("-a\r\n - a"));
+        assert.strictEqual(true, ext.validateMarkdown("-a\r\n - a\n"));
+        assert.strictEqual(true, ext.validateMarkdown("-a\r\n  - a"));
     });
 
     test("error cases(1 row)", function() {
@@ -31,19 +44,11 @@ suite("validation Tests", function () {
 
     test("error cases(2rows)", function() {
         // LF
-        assert.strictEqual(false, ext.validateMarkdown("-\n - a"));
-        assert.strictEqual(false, ext.validateMarkdown("-\n  - a"));
-        assert.strictEqual(false, ext.validateMarkdown("-a\n - a"));
-        assert.strictEqual(false, ext.validateMarkdown("-a\n  - a"));
         assert.strictEqual(false, ext.validateMarkdown("- \n -a"));
         assert.strictEqual(false, ext.validateMarkdown("- \n  -a"));
         assert.strictEqual(false, ext.validateMarkdown("- a\n -a"));
         assert.strictEqual(false, ext.validateMarkdown("- a\n  -a"));
         // CRLF
-        assert.strictEqual(false, ext.validateMarkdown("-\r\n - a"));
-        assert.strictEqual(false, ext.validateMarkdown("-\r\n  - a"));
-        assert.strictEqual(false, ext.validateMarkdown("-a\r\n - a"));
-        assert.strictEqual(false, ext.validateMarkdown("-a\r\n  - a"));
         assert.strictEqual(false, ext.validateMarkdown("- \r\n -a"));
         assert.strictEqual(false, ext.validateMarkdown("- \r\n  -a"));
         assert.strictEqual(false, ext.validateMarkdown("- a\r\n -a"));
@@ -53,7 +58,7 @@ suite("validation Tests", function () {
 });
 
 
-suite("String to Array Tests", function () {
+suite("String to Array Tests (1 row LF)", function () {
 
     test("1 row, 2 cols", function() {
         assert.deepStrictEqual([["th1","th2"],
@@ -64,8 +69,26 @@ suite("String to Array Tests", function () {
     test("1 row, 2 cols", function() {
         assert.deepStrictEqual([["th1","th2"],
                                 [":------",":------"],
+                               ], ext.getNetedArray("-\n - th1\n - th2"));
+    });
+});
+
+suite("String to Array Tests (1 row CRLF)", function () {
+
+    test("1 row, 2 cols", function() {
+        assert.deepStrictEqual([["th1","th2"],
+                                [":------",":------"],
                                ], ext.getNetedArray("- \r\n - th1\r\n - th2"));
     });
+
+    test("1 row, 2 cols", function() {
+        assert.deepStrictEqual([["th1","th2"],
+                                [":------",":------"],
+                               ], ext.getNetedArray("-\r\n - th1\r\n - th2"));
+    });
+});
+
+suite("String to Array Tests (2 row LF)", function () {
 
     test("2 rows, 2 cols", function() {
         assert.deepStrictEqual([["th1","th2"],
@@ -73,6 +96,31 @@ suite("String to Array Tests", function () {
                                 ["td1","td2"]
                                ], ext.getNetedArray("- \n - th1\n - th2\n- \n - td1\n - td2"));
     });
+
+    test("2 rows, 2 cols", function() {
+        assert.deepStrictEqual([["th1","th2"],
+                                [":------",":------"],
+                                ["td1","td2"]
+                               ], ext.getNetedArray("-\n - th1\n - th2\n-\n - td1\n - td2"));
+    });
+});
+
+suite("String to Array Tests (2 row CRLF)", function () {
+
+    test("2 rows, 2 cols", function() {
+        assert.deepStrictEqual([["th1","th2"],
+                                [":------",":------"],
+                                ["td1","td2"]
+                                ], ext.getNetedArray("- \r\n - th1\r\n - th2\r\n- \r\n - td1\r\n - td2"));
+    });
+
+    test("2 rows, 2 cols", function() {
+        assert.deepStrictEqual([["th1","th2"],
+                                [":------",":------"],
+                                ["td1","td2"]
+                                ], ext.getNetedArray("-\r\n - th1\r\n - th2\r\n-\r\n - td1\r\n - td2"));
+    });
+
 });
 
 suite("Array to Markdown Table Tests", function () {
@@ -110,4 +158,5 @@ suite("Array to Markdown Table Tests", function () {
                                                     , 2)
                                );
     });
+
 });
