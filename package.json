@@ -5,7 +5,7 @@
 	"version": "0.0.2",
 	"preview": true,
 	"publisher": "akira6592",
-	"author": "Akira yokochi",
+	"author": "Akira Yokochi",
 	"license": "MIT",
 	"engines": {
 		"vscode": "^1.30.0"
