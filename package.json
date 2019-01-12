@@ -21,7 +21,8 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/akira6592/vscode-l2mdtable"
-    },
+	},
+	"icon": "images/icon.png",
 	"activationEvents": [
 		"onCommand:l2mdtable.convert"
 	],
