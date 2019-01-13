@@ -10,3 +10,6 @@
 
 ## 0.0.4 - 2019/01/12
 - add changelog
+
+## 0.0.5 - 2019/01/13
+- allow no space after first level `-` (#1)
