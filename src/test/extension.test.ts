@@ -1,62 +1,110 @@
 import * as assert from 'assert';
 import * as ext from "../extension";
 
-suite("validation Tests", function () {
 
-    test("normal cases", function() {
-        // no space at first "-" 
-        assert.strictEqual(true, ext.validateMarkdown("- \n - a"));
-        assert.strictEqual(true, ext.validateMarkdown("- \n  - a"));
-        assert.strictEqual(true, ext.validateMarkdown("- a\n - a"));
-        assert.strictEqual(true, ext.validateMarkdown("- a\n - a\n"));
-        assert.strictEqual(true, ext.validateMarkdown("- a\n  - a"));
-        assert.strictEqual(true, ext.validateMarkdown("- \r\n - a"));
-        assert.strictEqual(true, ext.validateMarkdown("- \r\n  - a"));
-        assert.strictEqual(true, ext.validateMarkdown("- a\r\n - a"));
-        assert.strictEqual(true, ext.validateMarkdown("- a\r\n - a\n"));
-        assert.strictEqual(true, ext.validateMarkdown("- a\r\n  - a"));
+suite("empty Test", function () {
 
-        // space at first "-"
-        assert.strictEqual(true, ext.validateMarkdown("-\n - a"));
-        assert.strictEqual(true, ext.validateMarkdown("-\n  - a"));
-        assert.strictEqual(true, ext.validateMarkdown("-a\n - a"));
-        assert.strictEqual(true, ext.validateMarkdown("-a\n - a\n"));
-        assert.strictEqual(true, ext.validateMarkdown("-a\n  - a"));
-        assert.strictEqual(true, ext.validateMarkdown("-\r\n - a"));
-        assert.strictEqual(true, ext.validateMarkdown("-\r\n  - a"));
-        assert.strictEqual(true, ext.validateMarkdown("-a\r\n - a"));
-        assert.strictEqual(true, ext.validateMarkdown("-a\r\n - a\n"));
-        assert.strictEqual(true, ext.validateMarkdown("-a\r\n  - a"));
-    });
+    test("true cases (1 line)", function() {
+        assert.equal(true, ext.checkEmpty(""));
+        assert.equal(true, ext.checkEmpty(" "));
+        assert.equal(true, ext.checkEmpty("  "));
 
-    test("error cases(1 row)", function() {
-        assert.strictEqual(false, ext.validateMarkdown(""));
-        assert.strictEqual(false, ext.validateMarkdown(" "));
-        assert.strictEqual(false, ext.validateMarkdown("\n"));
-        assert.strictEqual(false, ext.validateMarkdown("-"));
-        assert.strictEqual(false, ext.validateMarkdown("- "));
-        assert.strictEqual(false, ext.validateMarkdown("-a"));
-        assert.strictEqual(false, ext.validateMarkdown("- a"));
-        assert.strictEqual(false, ext.validateMarkdown(" - a"));
-        assert.strictEqual(false, ext.validateMarkdown(" -a"));
-        assert.strictEqual(false, ext.validateMarkdown("\r\n"));
-    });
-
-    test("error cases(2rows)", function() {
         // LF
-        assert.strictEqual(false, ext.validateMarkdown("- \n -a"));
-        assert.strictEqual(false, ext.validateMarkdown("- \n  -a"));
-        assert.strictEqual(false, ext.validateMarkdown("- a\n -a"));
-        assert.strictEqual(false, ext.validateMarkdown("- a\n  -a"));
+        assert.equal(true, ext.checkEmpty("\n"));
+        assert.equal(true, ext.checkEmpty(" \n"));
+        assert.equal(true, ext.checkEmpty("  \n"));
+        assert.equal(true, ext.checkEmpty("- \n"));  // no childs
         // CRLF
-        assert.strictEqual(false, ext.validateMarkdown("- \r\n -a"));
-        assert.strictEqual(false, ext.validateMarkdown("- \r\n  -a"));
-        assert.strictEqual(false, ext.validateMarkdown("- a\r\n -a"));
-        assert.strictEqual(false, ext.validateMarkdown("- a\r\n  -a"));
+        assert.equal(true, ext.checkEmpty("\r\n"));
+        assert.equal(true, ext.checkEmpty(" \r\n"));
+        assert.equal(true, ext.checkEmpty("  \r\n"));
+        assert.equal(true, ext.checkEmpty("- \r\n"));  // no childs
+    });
+
+    test("true cases (multi lines)", function() {
+        // LF
+        assert.equal(true, ext.checkEmpty("\n  \n"));
+        assert.equal(true, ext.checkEmpty(" \n  \n"));
+        assert.equal(true, ext.checkEmpty("  \n  \n"));
+        assert.equal(true, ext.checkEmpty(" \n  \n  "));
+        assert.equal(true, ext.checkEmpty("  \n  \n  "));
+        assert.equal(true, ext.checkEmpty("- \n \n"));  // no childs
+        assert.equal(true, ext.checkEmpty("  \n- \n \n"));  // no childs
+        // CRLF
+        assert.equal(true, ext.checkEmpty("\r\n  \r\n"));
+        assert.equal(true, ext.checkEmpty(" \r\n  \r\n"));
+        assert.equal(true, ext.checkEmpty("  \r\n  \r\n"));
+        assert.equal(true, ext.checkEmpty(" \r\n  \r\n  "));
+        assert.equal(true, ext.checkEmpty("  \r\n  \r\n  "));
+        assert.equal(true, ext.checkEmpty("- \r\n \r\n"));  // no childs
+        assert.equal(true, ext.checkEmpty("  \r\n- \r\n \r\n"));  // no childs
+    });
+
+    test("false cases (1 line)", function() {
+        assert.equal(false, ext.checkEmpty("a"));
+        assert.equal(false, ext.checkEmpty("ab"));
+        // LF
+        assert.equal(false, ext.checkEmpty("a\n"));
+        assert.equal(false, ext.checkEmpty("ab\n"));        
+        // CRLF
+        assert.equal(false, ext.checkEmpty("a\r\n"));
+        assert.equal(false, ext.checkEmpty("ab\r\n"));
+    });
+
+    test("false cases (multi lines)", function() {
+        // LF
+        assert.equal(false, ext.checkEmpty(" \na"));
+        assert.equal(false, ext.checkEmpty("  \nab"));        
+        assert.equal(false, ext.checkEmpty("a\na"));
+        assert.equal(false, ext.checkEmpty("ab\nab"));        
+        // CRLF
+        assert.equal(false, ext.checkEmpty(" \r\na"));
+        assert.equal(false, ext.checkEmpty("  \r\nab"));
+        assert.equal(false, ext.checkEmpty("a\r\na"));
+        assert.equal(false, ext.checkEmpty("ab\r\nab"));
     });
 
 });
 
+suite("validation Tests", function () {
+
+    test("normal cases", function() {
+        // space at first "-" 
+        assert.deepStrictEqual([], ext.validateMarkdown([
+                                                            {line: 1, text:"- "},
+                                                            {line: 2, text:" - a"}
+                                                        ]));
+        assert.deepStrictEqual([], ext.validateMarkdown([
+                                                            {line: 1, text:"- a"},
+                                                            {line: 2, text:" - a"},
+                                                            {line: 3, text:" -  a"}
+                                                        ]));
+        // no space at first "-" 
+        assert.deepStrictEqual([], ext.validateMarkdown([
+                                                            {line: 1, text:"-"},
+                                                            {line: 2, text:" - a"}
+                                                        ]));
+        assert.deepStrictEqual([], ext.validateMarkdown([
+                                                            {line: 1, text:"-a"},
+                                                            {line: 2, text:" - a"},
+                                                            {line: 3, text:" -  a"}
+                                                        ]));
+        // empty (ignore)
+        assert.deepStrictEqual([], ext.validateMarkdown([
+                                                            {line: 1, text:""},
+                                                            {line: 2, text:" "},
+                                                            {line: 3, text:"  "}
+                                                        ]));
+    });
+
+    test("error cases", function() {
+        assert.deepStrictEqual([2, 3], ext.validateMarkdown([
+                                                            {line: 1, text:"- a"},
+                                                            {line: 2, text:" -a"},
+                                                            {line: 3, text:" -"},
+                                                        ]));
+    });                                              
+});
 
 suite("String to Array Tests (1 row LF)", function () {
 

@@ -2,7 +2,7 @@
 	"name": "l2mdtable",
 	"displayName": "Convert to Markdown Table",
 	"description": "Convert list to Markdown table.",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"preview": true,
 	"publisher": "akira6592",
 	"author": "Akira Yokochi",
