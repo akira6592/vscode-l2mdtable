@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 const msg901: string = "Select strings to convert to markdown.";  // for not selected
 const msg902: string = "Select valid markdown ranges."; // for invalid format
+const msg903Base: string = "Invalid lines: "; // for invalid format
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -13,11 +14,15 @@ export function activate(context: vscode.ExtensionContext) {
 			//valid format
 
 			let selectedText: string = editor.document.getText(editor.selection);
+			let selectedTextWithLine = getSelectedWithLine(editor);
 			// LF(1) / CRLF(2)
 			let eol: number = editor.document.eol;
 
 			// validate
-			if (validateMarkdown(selectedText)) {
+			let invalidLine: number[] = validateMarkdown(selectedTextWithLine);
+			let isEmpty: boolean = checkEmpty(selectedText);
+
+			if ((invalidLine.length === 0) && (isEmpty === false)) {
 				// string to netsted array
 				let nestedStringArray: string[][] = new Array();
 				nestedStringArray = getNetedArray(selectedText);
@@ -28,13 +33,19 @@ export function activate(context: vscode.ExtensionContext) {
 
 				// replace 
 				replaceContent(editor, tableString);
+			} else if(isEmpty){
+				// strings are selected but space or CR/LF only
+
+				notify(msg901);
+
 			} else {
 				// invalid format
 
-				notify(msg902);
+				notify(msg902 + msg903Base + invalidLine.join(", "));
 			}
 		} else {
 			// not selected
+
 			notify(msg901);
 		}
 	});
@@ -43,19 +54,71 @@ export function activate(context: vscode.ExtensionContext) {
 
 }
 
-export function validateMarkdown(str: string): boolean {
+export function checkEmpty(str: string): boolean {
 
-	if (str.match(/^-.*(\r)*\n +- .*/) !== null) {
-		// valid netsted lists
-
+	if (str.match(/^[ \r\n]*$/)) {
+		return true;
+	} else if(str.match(/^-.*$/))  {
+		// parant has no childs (one line)
+		return true;
+	} else if(str.match(/^-.*\r?\n[ \r\n]*$/))  {
+		// parant has no childs (multiline lines)
 		return true;
 	} else {
-		// invalid format
-		
-		notify(msg902);
 		return false;
 	}
 
+}
+
+export function getSelectedWithLine(editor: vscode.TextEditor): {line: number; text: string}[]  {
+		
+		let selectedWithLine: {line: number; text: string}[] = new Array();
+		let selectedRange: string[] = editor.document.getText(editor.selection).split(/\n/);
+		let line: number;
+
+		for (let i in selectedRange) {
+			line = editor.selection.start.line + 1 + Number(i);
+			selectedWithLine.push({line: line, text: selectedRange[i]});
+		}
+
+		// list of hash
+		return selectedWithLine;
+}
+
+export function validateMarkdown(selected: {line: number; text: string}[] ): number[] {
+
+	let hasParent: boolean = false;
+	// let valid: boolean = true; 
+	let invalidLine: number[] = new Array();
+
+	for (let i in selected) {
+
+		// format check
+		if (selected[i].text.match(/^-.*/)) {
+			// parent line (row level line)
+			hasParent = true;
+		} else if (selected[i].text.match(/^ +- +(.*)/)) {
+			// child line (column level line)
+
+			if (hasParent) {
+				continue;
+
+			} else {
+				// no parants
+				invalidLine.push(selected[i].line);
+			}
+
+		} else if (selected[i].text.match(/^ *$/)) {
+			// empty or space only line
+			// ignore
+
+		} else {
+			// invalid format
+			invalidLine.push(selected[i].line);
+		}
+	}
+
+	return invalidLine;
 }
 
 export function getNetedArray(str: string): string[][] {
@@ -68,7 +131,7 @@ export function getNetedArray(str: string): string[][] {
 	for (let i in flatStringArray) {
 
 		let matchedRow = flatStringArray[i].match(/^- ?.*/);
-		let matchedCol = flatStringArray[i].match(/^ +- (.*)/); 
+		let matchedCol = flatStringArray[i].match(/^ +- (.*)/);
 
 		if (matchedRow !== null) {
 			// row level line
