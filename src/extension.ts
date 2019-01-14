@@ -61,7 +61,7 @@ export function checkEmpty(str: string): boolean {
 	} else if(str.match(/^-.*$/))  {
 		// parant has no childs (one line)
 		return true;
-	} else if(str.match(/^-.*\r?\n[ \r\n]*$/))  {
+	} else if(str.match(/^[ \r\n]*-.*\r?\n[ \r\n]*$/))  {
 		// parant has no childs (multiline lines)
 		return true;
 	} else {

@@ -26,12 +26,18 @@ suite("empty Test", function () {
         assert.equal(true, ext.checkEmpty("\n  \n"));
         assert.equal(true, ext.checkEmpty(" \n  \n"));
         assert.equal(true, ext.checkEmpty("  \n  \n"));
+        assert.equal(true, ext.checkEmpty(" \n  \n  "));
+        assert.equal(true, ext.checkEmpty("  \n  \n  "));
         assert.equal(true, ext.checkEmpty("- \n \n"));  // no childs
+        assert.equal(true, ext.checkEmpty("  \n- \n \n"));  // no childs
         // CRLF
         assert.equal(true, ext.checkEmpty("\r\n  \r\n"));
         assert.equal(true, ext.checkEmpty(" \r\n  \r\n"));
         assert.equal(true, ext.checkEmpty("  \r\n  \r\n"));
+        assert.equal(true, ext.checkEmpty(" \r\n  \r\n  "));
+        assert.equal(true, ext.checkEmpty("  \r\n  \r\n  "));
         assert.equal(true, ext.checkEmpty("- \r\n \r\n"));  // no childs
+        assert.equal(true, ext.checkEmpty("  \r\n- \r\n \r\n"));  // no childs
     });
 
     test("false cases (1 line)", function() {
