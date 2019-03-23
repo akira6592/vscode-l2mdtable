@@ -119,6 +119,13 @@ suite("String to Array Tests (1 row LF)", function () {
                                 [":------",":------"],
                                ], ext.getNetedArray("-\n - th1\n - th2"));
     });
+
+    // needs trim
+    test("1 row, 2 cols", function() {
+        assert.deepStrictEqual([["th1","th2"],
+                                [":------",":------"],
+                               ], ext.getNetedArray("-\n - th1\n -   th2"));
+    });
 });
 
 suite("String to Array Tests (1 row CRLF)", function () {
@@ -151,6 +158,7 @@ suite("String to Array Tests (2 row LF)", function () {
                                 ["td1","td2"]
                                ], ext.getNetedArray("-\n - th1\n - th2\n-\n - td1\n - td2"));
     });
+
 });
 
 suite("String to Array Tests (2 row CRLF)", function () {

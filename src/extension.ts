@@ -131,7 +131,7 @@ export function getNetedArray(str: string): string[][] {
 	for (let i in flatStringArray) {
 
 		let matchedRow = flatStringArray[i].match(/^- ?.*/);
-		let matchedCol = flatStringArray[i].match(/^ +- (.*)/);
+		let matchedCol = flatStringArray[i].match(/^ +- +(.*)/);
 
 		if (matchedRow !== null) {
 			// row level line
